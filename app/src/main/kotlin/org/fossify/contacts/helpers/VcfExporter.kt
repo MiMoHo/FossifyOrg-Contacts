@@ -19,6 +19,7 @@ import org.fossify.commons.extensions.toast
 import org.fossify.commons.models.contacts.Contact
 import org.fossify.contacts.helpers.VcfExporter.ExportResult.EXPORT_FAIL
 import java.io.OutputStream
+import java.net.URLEncoder
 import java.time.LocalDate
 
 class VcfExporter {
@@ -147,19 +148,27 @@ class VcfExporter {
                 }
 
                 contact.IMs.forEach {
-                    val impp = when (it.type) {
-                        Im.PROTOCOL_AIM -> Impp.aim(it.value)
-                        Im.PROTOCOL_YAHOO -> Impp.yahoo(it.value)
-                        Im.PROTOCOL_MSN -> Impp.msn(it.value)
-                        Im.PROTOCOL_ICQ -> Impp.icq(it.value)
-                        Im.PROTOCOL_SKYPE -> Impp.skype(it.value)
-                        Im.PROTOCOL_GOOGLE_TALK -> Impp(HANGOUTS, it.value)
-                        Im.PROTOCOL_QQ -> Impp(QQ, it.value)
-                        Im.PROTOCOL_JABBER -> Impp(JABBER, it.value)
-                        else -> Impp(it.label, it.value)
-                    }
+                    try {
+                        val impp = when (it.type) {
+                            Im.PROTOCOL_AIM -> Impp.aim(it.value)
+                            Im.PROTOCOL_YAHOO -> Impp.yahoo(it.value)
+                            Im.PROTOCOL_MSN -> Impp.msn(it.value)
+                            Im.PROTOCOL_ICQ -> Impp.icq(it.value)
+                            Im.PROTOCOL_SKYPE -> Impp.skype(it.value)
+                            Im.PROTOCOL_GOOGLE_TALK -> Impp(HANGOUTS, it.value)
+                            Im.PROTOCOL_QQ -> Impp(QQ, it.value)
+                            Im.PROTOCOL_JABBER -> Impp(JABBER, it.value)
+                            // A custom IM protocol becomes the URI scheme of the IMPP value.
+                            // URI schemes may not contain spaces (or other illegal characters),
+                            // so encode the label to avoid crashing the whole export. This mirrors
+                            // the URLDecoder.decode(scheme) used by VcfImporter.
+                            else -> Impp(URLEncoder.encode(it.label, "UTF-8"), it.value)
+                        }
 
-                    card.addImpp(impp)
+                        card.addImpp(impp)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
 
                 if (contact.notes.isNotEmpty()) {

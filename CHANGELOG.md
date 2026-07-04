@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed contact export/sharing failing when an instant messaging field uses a custom type containing a space or other special character ([#499])
 
 ## [1.6.0] - 2026-01-30
 ### Added
@@ -127,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#360]: https://github.com/FossifyOrg/Contacts/issues/360
 [#415]: https://github.com/FossifyOrg/Contacts/issues/415
 [#452]: https://github.com/FossifyOrg/Contacts/issues/452
+[#499]: https://github.com/FossifyOrg/Contacts/issues/499
 
 [Unreleased]: https://github.com/FossifyOrg/Contacts/compare/1.6.0...HEAD
 [1.6.0]: https://github.com/FossifyOrg/Contacts/compare/1.5.0...1.6.0

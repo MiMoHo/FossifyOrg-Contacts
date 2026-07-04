@@ -18,6 +18,7 @@ import android.provider.ContactsContract.CommonDataKinds.Phone
 import android.provider.ContactsContract.CommonDataKinds.StructuredName
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal
 import android.provider.ContactsContract.CommonDataKinds.Website
+import android.provider.ContactsContract.Intents.Insert
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
@@ -263,7 +264,8 @@ class EditContactActivity : ContactActivity() {
         if (((contact!!.id == 0 && action == Intent.ACTION_INSERT) || action == ADD_NEW_CONTACT_NUMBER) && intent.extras != null) {
             val phoneNumber = getPhoneNumberFromIntent(intent)
             if (phoneNumber != null) {
-                contact!!.phoneNumbers.add(PhoneNumber(phoneNumber, DEFAULT_PHONE_NUMBER_TYPE, "", phoneNumber.normalizePhoneNumber()))
+                val phoneType = getInsertType(intent.extras!!, Insert.PHONE_TYPE, DEFAULT_PHONE_NUMBER_TYPE)
+                contact!!.phoneNumbers.add(PhoneNumber(phoneNumber, phoneType, "", phoneNumber.normalizePhoneNumber()))
                 if (phoneNumber.isNotEmpty() && action == ADD_NEW_CONTACT_NUMBER) {
                     highlightLastPhoneNumber = true
                 }
@@ -271,7 +273,8 @@ class EditContactActivity : ContactActivity() {
 
             val email = intent.getStringExtra(KEY_EMAIL)
             if (email != null) {
-                val newEmail = Email(email, DEFAULT_EMAIL_TYPE, "")
+                val emailType = getInsertType(intent.extras!!, Insert.EMAIL_TYPE, DEFAULT_EMAIL_TYPE)
+                val newEmail = Email(email, emailType, "")
                 contact!!.emails.add(newEmail)
                 highlightLastEmail = true
             }
@@ -280,6 +283,8 @@ class EditContactActivity : ContactActivity() {
             if (firstName != null) {
                 contact!!.firstName = firstName.toString()
             }
+
+            parseInsertExtras(intent)
 
             val data = intent.extras!!.getParcelableArrayList<ContentValues>("data")
             if (data != null) {
@@ -1592,6 +1597,56 @@ class EditContactActivity : ContactActivity() {
                     binding.contactPhotoBottomShadow.beGone()
                 }
             }
+        }
+    }
+
+    private fun parseInsertExtras(intent: Intent) {
+        val extras = intent.extras ?: return
+        val secondaryPhone = extras.getString(Insert.SECONDARY_PHONE)
+        if (!secondaryPhone.isNullOrEmpty()) {
+            val type = getInsertType(extras, Insert.SECONDARY_PHONE_TYPE, DEFAULT_PHONE_NUMBER_TYPE)
+            contact!!.phoneNumbers.add(PhoneNumber(secondaryPhone, type, "", secondaryPhone.normalizePhoneNumber()))
+        }
+        val tertiaryPhone = extras.getString(Insert.TERTIARY_PHONE)
+        if (!tertiaryPhone.isNullOrEmpty()) {
+            val type = getInsertType(extras, Insert.TERTIARY_PHONE_TYPE, DEFAULT_PHONE_NUMBER_TYPE)
+            contact!!.phoneNumbers.add(PhoneNumber(tertiaryPhone, type, "", tertiaryPhone.normalizePhoneNumber()))
+        }
+        val secondaryEmail = extras.getString(Insert.SECONDARY_EMAIL)
+        if (!secondaryEmail.isNullOrEmpty()) {
+            val type = getInsertType(extras, Insert.SECONDARY_EMAIL_TYPE, DEFAULT_EMAIL_TYPE)
+            contact!!.emails.add(Email(secondaryEmail, type, ""))
+        }
+        val tertiaryEmail = extras.getString(Insert.TERTIARY_EMAIL)
+        if (!tertiaryEmail.isNullOrEmpty()) {
+            val type = getInsertType(extras, Insert.TERTIARY_EMAIL_TYPE, DEFAULT_EMAIL_TYPE)
+            contact!!.emails.add(Email(tertiaryEmail, type, ""))
+        }
+        val company = extras.getString(Insert.COMPANY).orEmpty()
+        val jobTitle = extras.getString(Insert.JOB_TITLE).orEmpty()
+        if (company.isNotEmpty() || jobTitle.isNotEmpty()) {
+            contact!!.organization = Organization(company, jobTitle)
+        }
+        val postal = extras.getString(Insert.POSTAL)
+        if (!postal.isNullOrEmpty()) {
+            val type = getInsertType(extras, Insert.POSTAL_TYPE, DEFAULT_ADDRESS_TYPE)
+            contact!!.addresses.add(Address(postal, type, ""))
+        }
+        val notes = extras.getString(Insert.NOTES)
+        if (!notes.isNullOrEmpty()) {
+            contact!!.notes = notes
+        }
+        val imHandle = extras.getString(Insert.IM_HANDLE)
+        if (!imHandle.isNullOrEmpty()) {
+            contact!!.IMs.add(IM(imHandle, getInsertType(extras, Insert.IM_PROTOCOL, DEFAULT_IM_TYPE), ""))
+        }
+    }
+
+    private fun getInsertType(extras: Bundle, key: String, default: Int): Int {
+        return when (val value = extras.get(key)) {
+            is Int -> value
+            is String -> value.toIntOrNull() ?: default
+            else -> default
         }
     }
 

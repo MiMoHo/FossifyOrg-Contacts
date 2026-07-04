@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed phone numbers displaying with their digit groups in reversed order on right-to-left system languages (e.g. Arabic) ([#207])
 
 ## [1.6.0] - 2026-01-30
 ### Added
@@ -120,6 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#78]: https://github.com/FossifyOrg/Contacts/issues/78
 [#157]: https://github.com/FossifyOrg/Contacts/issues/157
 [#201]: https://github.com/FossifyOrg/Contacts/issues/201
+[#207]: https://github.com/FossifyOrg/Contacts/issues/207
 [#281]: https://github.com/FossifyOrg/Contacts/issues/281
 [#289]: https://github.com/FossifyOrg/Contacts/issues/289
 [#321]: https://github.com/FossifyOrg/Contacts/issues/321

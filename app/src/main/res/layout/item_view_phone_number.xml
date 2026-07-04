@@ -27,6 +27,7 @@
         android:lines="1"
         android:maxLines="1"
         android:singleLine="true"
+        android:textDirection="ltr"
         android:textSize="@dimen/bigger_text_size" />
 
     <org.fossify.commons.views.MyTextView

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.Email
 import android.provider.ContactsContract.CommonDataKinds.Phone
+import android.provider.ContactsContract.Intents.Insert
 import androidx.viewpager.widget.ViewPager
 import org.fossify.commons.databinding.BottomTablayoutItemBinding
 import org.fossify.commons.extensions.*
@@ -309,6 +310,7 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
                     putExtra(KEY_EMAIL, email)
                 }
 
+                copyImExtras(intent, this)
                 putExtra(IS_PRIVATE, contact.isPrivate())
                 startActivityForResult(this, START_EDIT_ACTIVITY)
             }
@@ -347,6 +349,7 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
                 putExtra(KEY_EMAIL, email)
             }
 
+            copyImExtras(intent, this)
             try {
                 startActivityForResult(this, START_INSERT_ACTIVITY)
             } catch (e: ActivityNotFoundException) {
@@ -354,6 +357,21 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
             } catch (e: Exception) {
                 showErrorToast(e)
             }
+        }
+    }
+
+    // forward the IM (e.g. Jabber/XMPP) extras of an INSERT_OR_EDIT intent so the contact
+    // editor (EditContactActivity) can pre-fill the IM field
+    private fun copyImExtras(source: Intent, target: Intent) {
+        val imHandle = source.getStringExtra(Insert.IM_HANDLE)
+        if (imHandle.isNullOrEmpty()) {
+            return
+        }
+
+        target.putExtra(Insert.IM_HANDLE, imHandle)
+        when (val protocol = source.extras?.get(Insert.IM_PROTOCOL)) {
+            is Int -> target.putExtra(Insert.IM_PROTOCOL, protocol)
+            is String -> target.putExtra(Insert.IM_PROTOCOL, protocol)
         }
     }
 

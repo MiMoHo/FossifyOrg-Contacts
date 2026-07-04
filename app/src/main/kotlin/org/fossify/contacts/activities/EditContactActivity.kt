@@ -18,6 +18,7 @@ import android.provider.ContactsContract.CommonDataKinds.Phone
 import android.provider.ContactsContract.CommonDataKinds.StructuredName
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal
 import android.provider.ContactsContract.CommonDataKinds.Website
+import android.provider.ContactsContract.Intents.Insert
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import android.view.WindowManager
@@ -276,6 +277,12 @@ class EditContactActivity : ContactActivity() {
                 highlightLastEmail = true
             }
 
+            val imHandle = intent.getStringExtra(Insert.IM_HANDLE)
+            if (!imHandle.isNullOrEmpty()) {
+                val (imType, imLabel) = getImTypeAndLabel(intent.extras!!.get(Insert.IM_PROTOCOL))
+                contact!!.IMs.add(IM(imHandle, imType, imLabel))
+            }
+
             val firstName = intent.extras!!.get(KEY_NAME)
             if (firstName != null) {
                 contact!!.firstName = firstName.toString()
@@ -372,6 +379,14 @@ class EditContactActivity : ContactActivity() {
             findItem(R.id.delete).isVisible = contact?.id != 0
             findItem(R.id.share).isVisible = contact?.id != 0
             findItem(R.id.open_with).isVisible = contact?.id != 0 && contact?.isPrivate() == false
+        }
+    }
+
+    private fun getImTypeAndLabel(protocol: Any?): Pair<Int, String> {
+        return when (protocol) {
+            is Int -> protocol to ""
+            is String -> protocol.toIntOrNull()?.let { it to "" } ?: (Im.PROTOCOL_CUSTOM to protocol)
+            else -> DEFAULT_IM_TYPE to ""
         }
     }
 

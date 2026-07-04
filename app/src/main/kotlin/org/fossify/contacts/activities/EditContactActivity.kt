@@ -427,6 +427,10 @@ class EditContactActivity : ContactActivity() {
 
             findItem(R.id.manage_visible_fields).setOnMenuItemClickListener {
                 ManageVisibleFieldsDialog(this@EditContactActivity) {
+                    // capture what is currently typed into the form, otherwise the rebuild
+                    // below would repopulate the name/notes/organization fields from the
+                    // stale (empty) in-memory contact and erase the user's input (see #472)
+                    contact = fillContactValues()
                     initContact()
                 }
                 true

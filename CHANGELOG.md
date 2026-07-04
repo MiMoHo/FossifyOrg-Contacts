@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed contact street addresses being exported as empty ADR fields (data loss) in vCard export ([#391])
 
 ## [1.6.0] - 2026-01-30
 ### Added
@@ -125,6 +127,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#321]: https://github.com/FossifyOrg/Contacts/issues/321
 [#339]: https://github.com/FossifyOrg/Contacts/issues/339
 [#360]: https://github.com/FossifyOrg/Contacts/issues/360
+[#391]: https://github.com/FossifyOrg/Contacts/issues/391
 [#415]: https://github.com/FossifyOrg/Contacts/issues/415
 [#452]: https://github.com/FossifyOrg/Contacts/issues/452
 

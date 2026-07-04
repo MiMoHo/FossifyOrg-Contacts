@@ -128,9 +128,7 @@ class VcfExporter {
                             it.pobox,
                             it.street,
                             it.neighborhood
-                        )
-                            .map { it.isEmpty() }
-                            .fold(false) { a, b -> a || b }
+                        ).any { component -> component.isNotEmpty() }
                     ) {
                         address.country = it.country
                         address.region = it.region

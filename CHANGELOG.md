@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed "No valid app found" when adding a contact photo on devices without an image cropper: the selected/taken photo is now applied directly instead of being discarded. ([#316])
 
 ## [1.6.0] - 2026-01-30
 ### Added
@@ -122,6 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#201]: https://github.com/FossifyOrg/Contacts/issues/201
 [#281]: https://github.com/FossifyOrg/Contacts/issues/281
 [#289]: https://github.com/FossifyOrg/Contacts/issues/289
+[#316]: https://github.com/FossifyOrg/Contacts/issues/316
 [#321]: https://github.com/FossifyOrg/Contacts/issues/321
 [#339]: https://github.com/FossifyOrg/Contacts/issues/339
 [#360]: https://github.com/FossifyOrg/Contacts/issues/360

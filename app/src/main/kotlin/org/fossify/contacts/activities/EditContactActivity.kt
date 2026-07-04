@@ -493,7 +493,9 @@ class EditContactActivity : ContactActivity() {
             try {
                 startActivityForResult(this, INTENT_CROP_PHOTO)
             } catch (e: ActivityNotFoundException) {
-                toast(org.fossify.commons.R.string.no_app_found)
+                // no image cropper is available (e.g. no gallery registering com.android.camera.action.CROP);
+                // fall back to using the picked/captured image directly instead of failing
+                updateContactPhoto(imageUri.toString(), binding.contactPhoto, binding.contactPhotoBottomShadow, bitmap)
             } catch (e: Exception) {
                 showErrorToast(e)
             }

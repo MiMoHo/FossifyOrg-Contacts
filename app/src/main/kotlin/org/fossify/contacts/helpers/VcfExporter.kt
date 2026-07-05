@@ -13,6 +13,7 @@ import ezvcard.VCardVersion
 import ezvcard.parameter.ImageType
 import ezvcard.property.*
 import ezvcard.util.PartialDate
+import org.fossify.commons.extensions.getByteArray
 import org.fossify.commons.extensions.getDateTimeFromDateString
 import org.fossify.commons.extensions.showErrorToast
 import org.fossify.commons.extensions.toast
@@ -178,14 +179,20 @@ class VcfExporter {
                 }
 
                 try {
-                    val inputStream =
+                    // Device contacts expose their photo through a content Uri, while local
+                    // ("hidden storage") contacts have an empty photoUri and keep the image only
+                    // as a Bitmap in contact.photo. Fall back to the Bitmap so photos stored in
+                    // hidden storage are also written to the exported vCard.
+                    val photoByteArray = if (contact.photoUri.isNotEmpty()) {
                         context.contentResolver.openInputStream(contact.photoUri.toUri())
+                            ?.use { it.readBytes() }
+                    } else {
+                        contact.photo?.getByteArray()
+                    }
 
-                    if (inputStream != null) {
-                        val photoByteArray = inputStream.readBytes()
+                    if (photoByteArray != null && photoByteArray.isNotEmpty()) {
                         val photo = Photo(photoByteArray, ImageType.JPEG)
                         card.addPhoto(photo)
-                        inputStream.close()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

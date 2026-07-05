@@ -31,6 +31,8 @@ import org.fossify.contacts.helpers.VcfImporter.ImportResult.IMPORT_OK
 import org.fossify.contacts.helpers.VcfImporter.ImportResult.IMPORT_PARTIAL
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.PushbackInputStream
 import java.net.URLDecoder
 import java.time.LocalDate
 import java.util.Locale
@@ -43,6 +45,10 @@ class VcfImporter(val activity: SimpleActivity) {
     private var contactsImported = 0
     private var contactsFailed = 0
 
+    companion object {
+        private const val BOM_SIZE = 3
+    }
+
     fun importContacts(path: String, targetContactSource: String): ImportResult {
         try {
             val inputStream = if (path.contains("/")) {
@@ -51,7 +57,7 @@ class VcfImporter(val activity: SimpleActivity) {
                 activity.assets.open(path)
             }
 
-            val ezContacts = Ezvcard.parse(inputStream).all()
+            val ezContacts = Ezvcard.parse(inputStream.skipByteOrderMark()).all()
             for (ezContact in ezContacts) {
                 val structuredName = ezContact.structuredName
                 val prefix = structuredName?.prefixes?.firstOrNull() ?: ""
@@ -410,5 +416,24 @@ class VcfImporter(val activity: SimpleActivity) {
         }
 
         return -1
+    }
+
+    // ezvcard's text parser wraps the stream in a plain InputStreamReader and does
+    // not strip a UTF-8 byte order mark (BOM). Some apps (e.g. Proton Contacts) and
+    // text editors prepend a BOM to exported .vcf files, which gets glued onto the
+    // first "BEGIN" property so no vCard is recognized and the whole import fails.
+    // See https://github.com/FossifyOrg/Contacts/issues/350
+    private fun InputStream.skipByteOrderMark(): InputStream {
+        val pushbackStream = PushbackInputStream(this, BOM_SIZE)
+        val potentialBom = ByteArray(BOM_SIZE)
+        val bytesRead = pushbackStream.read(potentialBom, 0, BOM_SIZE)
+        val isUtf8Bom = bytesRead == BOM_SIZE &&
+            potentialBom[0] == 0xEF.toByte() &&
+            potentialBom[1] == 0xBB.toByte() &&
+            potentialBom[2] == 0xBF.toByte()
+        if (bytesRead > 0 && !isUtf8Bom) {
+            pushbackStream.unread(potentialBom, 0, bytesRead)
+        }
+        return pushbackStream
     }
 }

@@ -204,7 +204,7 @@ class VcfExporter {
                 contactsExported++
             }
 
-            Ezvcard.write(cards).version(version).go(outputStream)
+            Ezvcard.write(cards).version(version).caretEncoding(true).go(outputStream)
         } catch (e: Exception) {
             context.showErrorToast(e)
         }

@@ -168,13 +168,13 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
     }
 
     private fun refreshMenuItems() {
-        val currentFragment = getCurrentFragment()
+        val currentTab = getCurrentTab()
         binding.mainMenu.requireToolbar().menu.apply {
-            findItem(R.id.sort).isVisible = currentFragment != findViewById(R.id.groups_fragment)
-            findItem(R.id.filter).isVisible = currentFragment != findViewById(R.id.groups_fragment)
+            findItem(R.id.sort).isVisible = currentTab != TAB_GROUPS
+            findItem(R.id.filter).isVisible = currentTab != TAB_GROUPS
             findItem(R.id.dialpad).isVisible = !config.showDialpadButton
-            findItem(R.id.change_view_type).isVisible = currentFragment == findViewById(R.id.favorites_fragment)
-            findItem(R.id.column_count).isVisible = currentFragment == findViewById(R.id.favorites_fragment) && config.viewType == VIEW_TYPE_GRID
+            findItem(R.id.change_view_type).isVisible = currentTab == TAB_FAVORITES
+            findItem(R.id.column_count).isVisible = currentTab == TAB_FAVORITES && config.viewType == VIEW_TYPE_GRID
             findItem(R.id.more_apps_from_us).isVisible = !resources.getBoolean(org.fossify.commons.R.bool.hide_google_relations)
         }
     }
@@ -294,6 +294,11 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
         }
 
         return fragments.getOrNull(binding.viewPager.currentItem)
+    }
+
+    private fun getCurrentTab(): Int {
+        val visibleTabs = tabsList.filter { config.showTabs and it != 0 }
+        return visibleTabs.getOrElse(binding.viewPager.currentItem) { TAB_CONTACTS }
     }
 
     private fun setupTabColors() {

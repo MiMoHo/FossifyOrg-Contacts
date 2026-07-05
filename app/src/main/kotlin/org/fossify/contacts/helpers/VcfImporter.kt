@@ -70,7 +70,7 @@ class VcfImporter(val activity: SimpleActivity) {
                         subtype = it.types.getOrNull(1)?.value
                     )
                     val label = if (type == Phone.TYPE_CUSTOM) {
-                        it.types.firstOrNull()?.value ?: ""
+                        it.parameters.types.firstOrNull() ?: ""
                     } else {
                         ""
                     }
@@ -92,7 +92,7 @@ class VcfImporter(val activity: SimpleActivity) {
                     val email = it.value
                     val type = getEmailTypeId(it.types.firstOrNull()?.value ?: HOME)
                     val label = if (type == CommonDataKinds.Email.TYPE_CUSTOM) {
-                        it.types.firstOrNull()?.value ?: ""
+                        it.parameters.types.firstOrNull() ?: ""
                     } else {
                         ""
                     }
@@ -107,7 +107,7 @@ class VcfImporter(val activity: SimpleActivity) {
                     var address = it.streetAddress ?: ""
                     val type = getAddressTypeId(it.types.firstOrNull()?.value ?: HOME)
                     val label = if (type == StructuredPostal.TYPE_CUSTOM) {
-                        it.types.firstOrNull()?.value ?: ""
+                        it.parameters.types.firstOrNull() ?: ""
                     } else {
                         ""
                     }

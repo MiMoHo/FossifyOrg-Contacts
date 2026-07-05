@@ -219,8 +219,7 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
             storedGroups = storedGroups.asSequence().sortedWith(compareBy { it.title.lowercase(Locale.getDefault()).normalizeString() })
                 .toMutableList() as ArrayList<Group>
 
-            innerBinding.fragmentPlaceholder2.beVisibleIf(storedGroups.isEmpty())
-            innerBinding.fragmentPlaceholder.beVisibleIf(storedGroups.isEmpty())
+            setupViewVisibility(storedGroups.isNotEmpty())
             innerBinding.letterFastscroller?.beVisibleIf(storedGroups.isNotEmpty())
 
             val currAdapter = innerBinding.fragmentList.adapter
